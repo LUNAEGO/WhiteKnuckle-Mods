@@ -1,0 +1,50 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net472</TargetFramework>
+    <AssemblyName>WKBioExperiment</AssemblyName>
+    <RootNamespace>WKBioExperiment</RootNamespace>
+    <LangVersion>latest</LangVersion>
+    <Nullable>disable</Nullable>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <GameDir Condition="'$(GameDir)' == ''">D:\SteamLibrary\steamapps\common\White Knuckle</GameDir>
+    <ManagedDir>$(GameDir)\White Knuckle_Data\Managed</ManagedDir>
+    <BepInExDir>$(GameDir)\BepInEx</BepInExDir>
+    <!-- Image\Biologically Experimented(1).png에서 흰 배경을 지우고 512x512로 맞춘 아이콘 -->
+    <IconPath>$(MSBuildProjectDirectory)\Icon\Biologically Experimented.png</IconPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- 아이콘 변환용 스크립트라 플러그인에는 넣지 않음 -->
+    <Compile Remove="Icon\**" />
+    <!-- 개발 기록용 이전 버전 소스 -->
+    <Compile Remove="archive\**" />
+    <None Remove="archive\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="$(BepInExDir)\core\BepInEx.dll" Private="false" />
+    <Reference Include="$(BepInExDir)\core\0Harmony.dll" Private="false" />
+    <Reference Include="$(ManagedDir)\Assembly-CSharp.dll" Private="false" />
+    <Reference Include="$(ManagedDir)\UnityEngine*.dll" Private="false" />
+    <Reference Include="$(ManagedDir)\ALINE.dll" Private="false" />
+    <Reference Include="$(ManagedDir)\Unity.Postprocessing.Runtime.dll" Private="false" />
+    <Reference Include="$(ManagedDir)\Unity.InputSystem.dll" Private="false" />
+    <Reference Include="$(ManagedDir)\DOTween.dll" Private="false" />
+    <Reference Include="$(ManagedDir)\System.Memory.dll" Private="false" />
+    <Reference Include="$(ManagedDir)\netstandard.dll" Private="false" />
+  </ItemGroup>
+
+  <!-- 빌드가 끝나면 게임의 BepInEx 플러그인 폴더로 복사 -->
+  <Target Name="DeployToGame" AfterTargets="Build" Condition="Exists('$(BepInExDir)\plugins')">
+    <MakeDir Directories="$(BepInExDir)\plugins\WKBioExperiment" />
+    <Copy SourceFiles="$(TargetPath);$(IconPath)" DestinationFolder="$(BepInExDir)\plugins\WKBioExperiment" />
+    <Message Importance="high" Text="배포 완료: $(BepInExDir)\plugins\WKBioExperiment\$(TargetFileName)" />
+  </Target>
+
+</Project>

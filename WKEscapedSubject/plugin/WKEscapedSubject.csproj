@@ -1,0 +1,46 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net472</TargetFramework>
+    <AssemblyName>WKEscapedSubject</AssemblyName>
+    <RootNamespace>WKEscapedSubject</RootNamespace>
+    <LangVersion>latest</LangVersion>
+    <Nullable>disable</Nullable>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <GameDir Condition="'$(GameDir)' == ''">D:\SteamLibrary\steamapps\common\White Knuckle</GameDir>
+    <ManagedDir>$(GameDir)\White Knuckle_Data\Managed</ManagedDir>
+    <BepInExDir>$(GameDir)\BepInEx</BepInExDir>
+    <!-- false로 빌드하면 게임 폴더로 복사하지 않음: dotnet build -p:Deploy=false -->
+    <Deploy Condition="'$(Deploy)' == ''">true</Deploy>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="$(BepInExDir)\core\BepInEx.dll" Private="false" />
+    <Reference Include="$(BepInExDir)\core\0Harmony.dll" Private="false" />
+    <Reference Include="$(ManagedDir)\Assembly-CSharp.dll" Private="false" />
+    <Reference Include="$(ManagedDir)\UnityEngine*.dll" Private="false" />
+    <Reference Include="$(ManagedDir)\ALINE.dll" Private="false" />
+    <Reference Include="$(ManagedDir)\DOTween.dll" Private="false" />
+    <Reference Include="$(ManagedDir)\Unity.TextMeshPro.dll" Private="false" />
+    <Reference Include="$(ManagedDir)\Unity.InputSystem.dll" Private="false" />
+    <Reference Include="$(ManagedDir)\System.Memory.dll" Private="false" />
+    <Reference Include="$(ManagedDir)\netstandard.dll" Private="false" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- 그림·소리는 DLL 안에 넣는다 (모드 매니저가 폴더를 펼쳐 같은 이름 파일이 덮어써지므로). 이름: Assets/<하위 경로> -->
+    <EmbeddedResource Include="Assets\**\*.png;Assets\**\*.wav;Assets\**\*.txt" LogicalName="Assets/%(RecursiveDir)%(Filename)%(Extension)" />
+  </ItemGroup>
+
+  <!-- 빌드가 끝나면 DLL을 BepInEx 플러그인 폴더로 복사 (그림·소리는 DLL 안에 들어 있음) -->
+  <Target Name="DeployToGame" AfterTargets="Build" Condition="'$(Deploy)' == 'true' And Exists('$(BepInExDir)\plugins')">
+    <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(BepInExDir)\plugins\WKEscapedSubject" />
+    <Message Importance="high" Text="배포 완료: $(BepInExDir)\plugins\WKEscapedSubject" />
+  </Target>
+
+</Project>
